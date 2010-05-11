@@ -6,3 +6,6 @@ $lang['vote_over'] = 'This vote is over.';
 
 $lang['leading'] = '%s is currently leading.';
 $lang['has_won'] = '%s has won.';
+
+$lang['invalid_vote'] = 'Your vote for %s is not numeric.';
+$lang['voted'] = 'Vote submitted.';
