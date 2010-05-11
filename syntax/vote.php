@@ -138,14 +138,28 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _handlepost($data) {
         $err = false;
+        $max_vote = null;
         foreach($_POST['vote'] as $n => &$vote) {
-            if ($vote !== '' && !is_numeric($vote)) {
-                msg(sprintf($this->getLang('invalid_vote'), $data['candy'][$n]), -1);
-                $vote = '';
-                $err = true;
+            if ($vote !== '') {
+                if (!is_numeric($vote)) {
+                    msg(sprintf($this->getLang('invalid_vote'), $data['candy'][$n]), -1);
+                    $vote = '';
+                    $err = true;
+                } else {
+                    $vote = (int) $vote;
+                    $max_vote = max($vote, $max_vote);
+                }
             }
         }
+        unset($vote);
         if ($err || count(array_filter($_POST['vote'])) === 0) return;
+
+        foreach($_POST['vote'] as &$vote) {
+            if ($vote === '') {
+                $vote = $max_vote + 1;
+            }
+        }
+
         $hlp = plugin_load('helper', 'schulzevote');
         $hlp->vote(array_combine($data['candy'], $_POST['vote']));
         msg($this->getLang('voted'), 1);
