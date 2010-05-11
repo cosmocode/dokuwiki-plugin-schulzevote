@@ -45,13 +45,11 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         $out = array();
         foreach ($this->candys as $i) {
             foreach ($this->candys as $j) {
-                if ($i != $j) {
-                    if ($in[$i][$j] > $in[$j][$i]) {
-                        $out[$i][$j] = $in[$i][$j];
-                    } else {
-                        $out[$i][$j] = 0;
-                    }
-                } else { $out[$i][$j] = 0; }
+                if ($i != $j && $in[$i][$j] > $in[$j][$i]) {
+                    $out[$i][$j] = $in[$i][$j];
+                } else {
+                    $out[$i][$j] = 0;
+                }
             }
         }
 
@@ -73,14 +71,15 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     function getWinner() {
         $get = $this->get();
+#dbg($get);
 
         foreach ($this->candys as $test) {
-            echo "test $test...";
+#            echo "test $test...";
             if ($this->isWinner($test, $get)) {
-                echo "winner!";
+#                echo "winner!";
                 return $test;
             }
-            echo "looser!\n";
+#            echo "looser!\n";
         }
         return null;
     }
@@ -96,17 +95,11 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     }
 
     // create a new vote to a candidate array
-    // if there is already a vote it'll be deleted.
     function createVote($candidates) {
-        $this->prefer = array();
-        $this->candys = $candidates;
-        $this->votees = array();
+        if ($candidates !== $this->candys) {
+            $this->prefer = array();
+            $this->candys = $candidates;
+            $this->votees = array();
+        }
     }
-
-    // get the candidates from the current vote
-    function getCandidates() {
-
-    }
-
-
 }

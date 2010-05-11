@@ -90,19 +90,22 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         }
 
         $hlp = plugin_load('helper', 'schulzevote');
+#        dbg($hlp);
+
         // check if the vote is over.
         $open = ($data['opts']['date'] !== null) && ($data['opts']['date'] > time());
         if ($open) {
             $renderer->info['cache'] = false;
-            if (is_null($_SERVER['REMOTE_USER'])) {
+            if (!isset($_SERVER['REMOTE_USER'])) {
                 $open = false;
-                $closemsg = 'You need to login in order to vote. Currently leading is ' .  $hlp->getWinner();
+                $closemsg = $this->getLang('no_remote_user');
             } elseif ($hlp->hasVoted()) {
                 $open = false;
-                $closemsg = 'You have voted already. Currently leading is ' .  $hlp->getWinner();
+                $closemsg = $this->getLang('already_voted');
             }
+            $closemsg .= ' ' . $this->_winnerMsg($hlp, 'leading');
         } else {
-            $closemsg = 'Vote is over, winner is ' . $hlp->getWinner();
+            $closemsg = $this->getLang('vote_over') . ' ' . $this->_winnerMsg($hlp, 'has_won');
         }
 
         if ($open) {
@@ -113,7 +116,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 $form->addElement(form_makeTextField('vote[' . $n . ']', isset($_POST['vote']) ? $_POST['vote'][$n] : '', $candy));
             }
             $form->addElement(form_makeButton('submit','', 'Vote!'));
-            $form->addElement('Currently leading is ' .  $hlp->getWinner());
+            $form->addElement($this->_winnerMsg($hlp, 'leading'));
             $renderer->doc .=  $form->getForm();
         } else {
             $renderer->doc .= '<div class="plugin_schulzevote_vote' .$align. '">';
@@ -125,6 +128,11 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         }
 
         return true;
+    }
+
+    function _winnerMsg($hlp, $lang) {
+        $winner = $hlp->getWinner();
+        return !is_null($winner) ? sprintf($this->getLang($lang), $winner) : '';
     }
 
     function _handlepost($data) {
