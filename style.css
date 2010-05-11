@@ -1,23 +1,41 @@
-.plugin_schulzevote_vote {
+
+#plugin__schulzevote {
     width: 15em;
-    border: 1px solid __border__;
     padding: 1em 1em 0 1em;
     margin: .5em;
 }
 
-.plugin_schulzevote_vote.center {
+
+.plugin_schulzevote_center {
     margin-left: auto;
     margin-right: auto;
 }
-.plugin_schulzevote_vote.left { float:left; }
-.plugin_schulzevote_vote.right { float:right; }
+.plugin_schulzevote_left {
+    float:left;
+}
+.plugin_schulzevote_right {
+    float:right;
+}
 
+#plugin__schulzevote fieldset legend {
+    text-align: left;
+}_
 
-
-
-.plugin_schulzevote_vote p {
+#plugin__schulzevote p {
     text-align:center;
 }
+
+#plugin__schulzevote p.candy {
+    font-weight: bold;
+}
+
+#plugin__schulzevote label.block input {
+    width: 15%;
+    margin-right: 30%;
+    margin-left: 5%;
+}
+
+/*
 .plugin_schulzevote_vote p input.edit {
     width: 3em;
     float:left;
@@ -25,4 +43,6 @@
 .plugin_schulzevote_vote p label {
     margin-left: .5em;
 }
+*/
+
 

@@ -46,7 +46,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         }
 
         // Determine align informations
-        $opts['align'] = null;
+        $opts['align'] = 'left';
         if (preg_match('/(left|right|center)/',$lines[0], $align)) {
             $opts['align'] = $align[0];
         }
@@ -84,10 +84,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         global $ID;
 
         // set alignment
-        $align = "";
-        if ($data['opts']['align'] !== null) {
-            $align = ' ' . $data['opts']['align'];
-        }
+        $align = $data['opts']['align'];
 
         $hlp = plugin_load('helper', 'schulzevote');
 #        dbg($hlp);
@@ -103,29 +100,33 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 $open = false;
                 $closemsg = $this->getLang('already_voted');
             }
-            $closemsg .= ' ' . $this->_winnerMsg($hlp, 'leading');
+            $closemsg .= '<br />'.$this->_winnerMsg($hlp, 'leading');
         } else {
-            $closemsg = $this->getLang('vote_over') . ' ' . $this->_winnerMsg($hlp, 'has_won');
+            $closemsg = $this->getLang('vote_over').'<br />'.
+                        $this->_winnerMsg($hlp, 'has_won');
         }
+
+        $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
+        $form->startFieldset($this->getLang('cast'));
 
         if ($open) {
-            $form = new Doku_Form(array('class' => 'plugin_schulzevote_vote'.$align));
             $form->addHidden('id', $ID);
-
             foreach ($data['candy'] as $n => $candy) {
-                $form->addElement(form_makeTextField('vote[' . $n . ']', isset($_POST['vote']) ? $_POST['vote'][$n] : '', $candy));
+                $form->addElement(form_makeTextField('vote[' . $n . ']',
+                                  isset($_POST['vote']) ? $_POST['vote'][$n] : '', $candy,'', 'block'));
             }
+            $form->addElement('<p>'.$this->getLang('howto').'</p>');
             $form->addElement(form_makeButton('submit','', 'Vote!'));
             $form->addElement($this->_winnerMsg($hlp, 'leading'));
-            $renderer->doc .=  $form->getForm();
-        } else {
-            $renderer->doc .= '<div class="plugin_schulzevote_vote' .$align. '">';
+        }else{
             foreach ($data['candy'] as $candy) {
-                $renderer->doc .= '<p>' . hsc($candy) . '</p>';
+                $form->addElement('<p class="candy">' . hsc($candy) . '</p>');
             }
-            $renderer->doc .= '<p>' . $closemsg . '</p>';
-            $renderer->doc .= '</div>';
+            $form->addElement('<p>' . $closemsg . '</p>');
         }
+
+        $form->endFieldset();
+        $renderer->doc .=  $form->getForm();
 
         return true;
     }
