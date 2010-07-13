@@ -7,9 +7,9 @@
  *
  * syntax:
  * <vote right 2010-04-10>
- *  candaidate A
- *  candaidate B
- *  candaidate C
+ *  candidate A
+ *  candidate B
+ *  candidate C
  * </vote>
  *
  * @author Dominik Eckelmann <eckelmann@cosmocode.de>
@@ -118,6 +118,18 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             $form->addElement('<p>'.$this->getLang('howto').'</p>');
             $form->addElement(form_makeButton('submit','', 'Vote!'));
             $form->addElement($this->_winnerMsg($hlp, 'leading'));
+            $ranks = $hlp->getRanking();
+            $ambig = false;
+            $items = array();
+            foreach($ranks as $rank) {
+                if (count($rank) > 1) {
+                    $ambig = true;
+                }
+                $items = array_merge($items, $rank);
+            }
+            $form->addElement('<p>' . sprintf($this->getLang('ranking'), implode(' > ', $items)));
+            if ($ambig) $form->addElement(' ' . $this->getLang('ranking_ambiguous'));
+            $form->addElement('</p>');
         }else{
             foreach ($data['candy'] as $candy) {
                 $form->addElement('<p class="candy">' . hsc($candy) . '</p>');

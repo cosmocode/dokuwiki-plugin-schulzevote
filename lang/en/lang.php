@@ -11,3 +11,6 @@ $lang['has_won'] = '%s has won.';
 
 $lang['invalid_vote'] = 'Your vote for %s is not numeric.';
 $lang['voted'] = 'Vote submitted.';
+
+$lang['ranking'] = 'The ranking is as follows: %s';
+$lang['ranking_ambiguous'] = '(Note that the ranking is ambiguous)';
