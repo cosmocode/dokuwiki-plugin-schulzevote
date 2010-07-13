@@ -113,7 +113,8 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             $form->addHidden('id', $ID);
             foreach ($data['candy'] as $n => $candy) {
                 $form->addElement(form_makeTextField('vote[' . $n . ']',
-                                  isset($_POST['vote']) ? $_POST['vote'][$n] : '', $candy,'', 'block'));
+                                  isset($_POST['vote']) ? $_POST['vote'][$n] : '',
+                                  $this->_render($candy), '', 'block'));
             }
             $form->addElement('<p>'.$this->getLang('howto').'</p>');
             $form->addElement(form_makeButton('submit','', 'Vote!'));
@@ -127,12 +128,12 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 }
                 $items = array_merge($items, $rank);
             }
-            $form->addElement('<p>' . sprintf($this->getLang('ranking'), implode(' > ', $items)));
+            $form->addElement('<p>' . sprintf($this->getLang('ranking'), implode(' > ', array_map(array($this, '_render'), $items))));
             if ($ambig) $form->addElement(' ' . $this->getLang('ranking_ambiguous'));
             $form->addElement('</p>');
         }else{
             foreach ($data['candy'] as $candy) {
-                $form->addElement('<p class="candy">' . hsc($candy) . '</p>');
+                $form->addElement('<p class="candy">' . $this->_render($candy) . '</p>');
             }
             $form->addElement('<p>' . $closemsg . '</p>');
         }
@@ -145,7 +146,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _winnerMsg($hlp, $lang) {
         $winner = $hlp->getWinner();
-        return !is_null($winner) ? sprintf($this->getLang($lang), $winner) : '';
+        return !is_null($winner) ? sprintf($this->getLang($lang), $this->_render($winner)) : '';
     }
 
     function _handlepost($data) {
@@ -175,6 +176,10 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         $hlp = plugin_load('helper', 'schulzevote');
         $hlp->vote(array_combine($data['candy'], $_POST['vote']));
         msg($this->getLang('voted'), 1);
+    }
+
+    function _render($str) {
+        return p_render('xhtml', array_slice(p_get_instructions($str), 2, -2), $notused);
     }
 }
 
