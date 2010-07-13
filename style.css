@@ -1,6 +1,5 @@
 
 #plugin__schulzevote {
-    width: 15em;
     padding: 1em 1em 0 1em;
     margin: .5em;
 }
@@ -24,12 +23,18 @@
     text-align:center;
 }
 
-#plugin__schulzevote p.candy {
+#plugin__schulzevote .candy {
     font-weight: bold;
+    text-align:left;
 }
 
 #plugin__schulzevote label.block input {
     width: 15%;
     margin-right: 30%;
     margin-left: 5%;
+}
+
+#plugin__schulzevote .votebar {
+    float: right;
+    background-color: __background_alt__;
 }

@@ -109,30 +109,28 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
         $form->startFieldset($this->getLang('cast'));
 
+        $ranks = array();
+        foreach($hlp->getRanking() as $rank => $items) {
+            foreach($items as $item) {
+                $ranks[$item] = '<span class="votebar" style="width: ' . (80 / ($rank + 1)) . 'px">&nbsp;</span>';
+            }
+        }
+
         if ($open) {
             $form->addHidden('id', $ID);
             foreach ($data['candy'] as $n => $candy) {
+                $form->addElement($ranks[$candy]);
                 $form->addElement(form_makeTextField('vote[' . $n . ']',
                                   isset($_POST['vote']) ? $_POST['vote'][$n] : '',
-                                  $this->_render($candy), '', 'block'));
+                                  $this->_render($candy), '', 'block candy'));
             }
             $form->addElement('<p>'.$this->getLang('howto').'</p>');
             $form->addElement(form_makeButton('submit','', 'Vote!'));
             $form->addElement($this->_winnerMsg($hlp, 'leading'));
-            $ranks = $hlp->getRanking();
-            $ambig = false;
-            $items = array();
-            foreach($ranks as $rank) {
-                if (count($rank) > 1) {
-                    $ambig = true;
-                }
-                $items = array_merge($items, $rank);
-            }
-            $form->addElement('<p>' . sprintf($this->getLang('ranking'), implode(' > ', array_map(array($this, '_render'), $items))));
-            if ($ambig) $form->addElement(' ' . $this->getLang('ranking_ambiguous'));
             $form->addElement('</p>');
         }else{
             foreach ($data['candy'] as $candy) {
+                $form->addElement($ranks[$candy]);
                 $form->addElement('<p class="candy">' . $this->_render($candy) . '</p>');
             }
             $form->addElement('<p>' . $closemsg . '</p>');
