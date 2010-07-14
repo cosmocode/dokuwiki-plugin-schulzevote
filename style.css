@@ -23,18 +23,25 @@
     text-align:center;
 }
 
-#plugin__schulzevote .candy {
+#plugin__schulzevote table {
     font-weight: bold;
     text-align:left;
+    width: 100%;
+}
+
+#plugin__schulzevote table td {
+    padding: 0 1.5em;
+}
+
+#plugin__schulzevote .candy span {
+    display: none;
 }
 
 #plugin__schulzevote label.block input {
-    width: 15%;
-    margin-right: 30%;
-    margin-left: 5%;
+    float: left;
 }
 
 #plugin__schulzevote .votebar {
-    float: right;
+    display: block;
     background-color: __background_alt__;
 }

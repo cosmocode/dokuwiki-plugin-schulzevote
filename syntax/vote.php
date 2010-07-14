@@ -106,9 +106,6 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                         $this->_winnerMsg($hlp, 'has_won');
         }
 
-        $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
-        $form->startFieldset($this->getLang('cast'));
-
         $ranks = array();
         foreach($hlp->getRanking() as $rank => $items) {
             foreach($items as $item) {
@@ -116,23 +113,38 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
         }
 
+        $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
+        $form->startFieldset($this->getLang('cast'));
         if ($open) {
             $form->addHidden('id', $ID);
-            foreach ($data['candy'] as $n => $candy) {
-                $form->addElement($ranks[$candy]);
+        }
+
+        $form->addElement('<table>');
+        foreach ($data['candy'] as $n => $candy) {
+            $form->addElement('<tr>');
+            $form->addElement('<td>');
+            $form->addElement($this->_render($candy));
+            $form->addElement('</td>');
+            if ($open) {
+                $form->addElement('<td>');
                 $form->addElement(form_makeTextField('vote[' . $n . ']',
                                   isset($_POST['vote']) ? $_POST['vote'][$n] : '',
                                   $this->_render($candy), '', 'block candy'));
+                $form->addElement('</td>');
             }
+            $form->addElement('<td>');
+            $form->addElement($ranks[$candy]);
+            $form->addElement('</td>');
+            $form->addElement('</tr>');
+        }
+        $form->addElement('</table>');
+
+        if ($open) {
             $form->addElement('<p>'.$this->getLang('howto').'</p>');
             $form->addElement(form_makeButton('submit','', 'Vote!'));
             $form->addElement($this->_winnerMsg($hlp, 'leading'));
             $form->addElement('</p>');
-        }else{
-            foreach ($data['candy'] as $candy) {
-                $form->addElement($ranks[$candy]);
-                $form->addElement('<p class="candy">' . $this->_render($candy) . '</p>');
-            }
+        } else {
             $form->addElement('<p>' . $closemsg . '</p>');
         }
 
