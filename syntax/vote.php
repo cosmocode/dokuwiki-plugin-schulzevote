@@ -30,7 +30,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
          $this->Lexer->addSpecialPattern('<vote[ a-z0-9-]*?>\n.*?\n</vote>',$mode,'plugin_schulzevote_vote');
     }
 
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $lines = explode("\n", $match);
 
         $opts = array();
@@ -69,7 +69,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         return array('candy' => $candidates, 'opts' => $opts);
     }
 
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
 
         if ($mode != 'xhtml') return false;
 
