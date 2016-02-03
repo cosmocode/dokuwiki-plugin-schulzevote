@@ -1,7 +1,7 @@
 base   schulzevote
 author Dominik Eckelmann
 email  dokuwiki@cosmocode.de
-date   2015-02-24
+date   2016-02-02
 name   Voting with Schulze Method
 desc   a voting system per page using the schulze method
 url    http://www.dokuwiki.org/plugin:schulzevote
