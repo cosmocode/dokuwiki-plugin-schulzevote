@@ -10,4 +10,7 @@ $lang['leading'] = '%s is currently leading.';
 $lang['has_won'] = '%s has won.';
 
 $lang['invalid_vote'] = 'Your vote for %s is not numeric.';
-$lang['voted'] = 'Vote submitted.';
+$lang['invalidated_vote'] = 'Your vote is invalid. Please verify that<ol><li>you have not yet voted</li><li>all the scores are different, and</li><li>you did not forget a \'0\'.</li></ol>';
+$lang['vote'] = 'Vote';
+$lang['voted'] = 'Your vote was successfully registered.';
+$lang['vote_cancel'] = 'Cancel your vote';

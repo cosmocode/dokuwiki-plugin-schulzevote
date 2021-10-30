@@ -4,23 +4,22 @@
 if (!defined('DOKU_INC')) die();
 require_once(DOKU_INC.'inc/pluginutils.php');
 
-class helper_plugin_schulzevote extends DokuWiki_Plugin {
+class helper_plugin_myschulzevote extends DokuWiki_Plugin {
 
     function __construct() {
         global $ID;
-        $data = p_get_metadata($ID, 'schulzevote');
-        $this->prefer = $data['prefer'];
-        $this->candys = $data['candys'];
-        $this->votees = $data['votees'];
+        $data = p_get_metadata($ID, 'myschulzevote');
+        $this->options = $data['options'];
+        $this->votes = $data['votes'];
 
 /* Ambiguous, but B > C and D > A
-        $this->prefer = array(
+        $prefer = array(
 'A' => array('A' => 0, 'B' => 5, 'C' => 5, 'D' => 3),
 'B' => array('A' => 4, 'B' => 0, 'C' => 7, 'D' => 5),
 'C' => array('A' => 4, 'B' => 2, 'C' => 0, 'D' => 5),
 'D' => array('A' => 6, 'B' => 4, 'C' => 4, 'D' => 0),
 );
-        $this->candys = array(
+        $this->options = array(
 'A' => 'A',
 'B' => 'B',
 'C' => 'C',
@@ -29,14 +28,14 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 */
 
 /* E > A > C > B > D
-        $this->prefer = array(
+        $prefer = array(
 'A' => array('A' => 0, 'B' => 20, 'C' => 26, 'D' => 30, 'E' => 22),
 'B' => array('A' => 25, 'B' => 0, 'C' => 16, 'D' => 33, 'E' => 18),
 'C' => array('A' => 19, 'B' => 29, 'C' => 0, 'D' => 17, 'E' => 24),
 'D' => array('A' => 15, 'B' => 12, 'C' => 28, 'D' => 0, 'E' => 14),
 'E' => array('A' => 23, 'B' => 27, 'C' => 21, 'D' => 31, 'E' => 0),
 );
-        $this->candys = array(
+        $this->options = array(
 'A' => 'A',
 'B' => 'B',
 'C' => 'C',
@@ -48,36 +47,58 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     function __destruct() {
         global $ID;
-        p_set_metadata($ID, array('schulzevote' => array('prefer' => $this->prefer, 'candys' => $this->candys, 'votees' => $this->votees)));
+        p_set_metadata($ID, array('myschulzevote' => array('options' => $this->options, 'votes' => $this->votes)));
     }
 
     // run a vote $data = array('a' => 1, 'b' => 2, 'c' => 2, 'd' => 3)
     // user need to be logged in
-    // recalc the winner and prefer matrix
     function vote($data) {
         global $ID;
+        if ($this->hasVoted())
+            return false;
+        $unique_values = array();
+        foreach ($data as $cand => $score) {
+            if ($score === 0)
+                return false;
+            if (in_array($score, $unique_values))
+                return false;
+            $unique_values[] = $score;
+        }
+        $this->votes[] = array('user' => $_SERVER['REMOTE_USER'], 'data' => $data);
+        return true;
+    }
 
-        foreach ($data as $k => $v) {
-            foreach($data as $k2 => $v2) {
-                if ($v < $v2) {
-                    ++$this->prefer[$k][$k2];
+    // recalc the winner and prefer matrix
+    function getPreferences() {
+        if (empty($this->votes))
+            return array();
+        $prefer = array();
+        foreach ($this->votes as $vote) {
+            foreach ($vote['data'] as $k => $v) {
+                foreach($vote['data'] as $k2 => $v2) {
+                    if ($v < $v2) {
+                        ++$prefer[$k][$k2];
+                    }
                 }
             }
         }
-        $this->votees[] = $_SERVER['REMOTE_USER'];
+        return $prefer;
     }
 
     function hasVoted() {
-        return in_array($_SERVER['REMOTE_USER'], $this->votees);
+        foreach ($this->votes as $vote)
+          if ($vote['user'] === $_SERVER['REMOTE_USER'])
+            return true;
+        return false;
     }
 
     /* Return strength of the strongest path */
     function get() {
 
-        $in = $this->prefer;
+        $in = $this->getPreferences();
         $out = array();
-        foreach ($this->candys as $i) {
-            foreach ($this->candys as $j) {
+        foreach ($this->options as $i) {
+            foreach ($this->options as $j) {
                 if ($i != $j && $in[$i][$j] > $in[$j][$i]) {
                     $out[$i][$j] = $in[$i][$j];
                 } else {
@@ -86,10 +107,10 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
             }
         }
 
-        foreach ($this->candys as $i) {
-            foreach ($this->candys as $j) {
+        foreach ($this->options as $i) {
+            foreach ($this->options as $j) {
                 if ($i!=$j) {
-                    foreach ($this->candys as $k) {
+                    foreach ($this->options as $k) {
                         if ($i!=$k) {
                             if ($j!=$k) {
                                 $out[$j][$k] = max($out[$j][$k], min($out[$j][$i], $out[$i][$k]));
@@ -128,7 +149,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         $get = $this->get();
 #dbg($get);
 
-        foreach ($this->candys as $test) {
+        foreach ($this->options as $test) {
 #            echo "test $test...";
             if ($this->isWinner($test, $get)) {
 #                echo "winner!";
@@ -140,7 +161,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     }
 
     function isWinnerCandidate($candy, $get) {
-        foreach ($this->candys as $other) {
+        foreach ($this->options as $other) {
             if ($candy == $other) continue;
             if ($get[$candy][$other] < $get[$other][$candy]) {
                 return false;
@@ -150,7 +171,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     }
 
     function isWinner($candy, $get) {
-        foreach ($this->candys as $other) {
+        foreach ($this->options as $other) {
             if ($candy == $other) continue;
             if ($get[$candy][$other] <= $get[$other][$candy]) {
                 return false;
@@ -161,10 +182,16 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     // create a new vote to a candidate array
     function createVote($candidates) {
-        if ($candidates !== $this->candys) {
-            $this->prefer = array();
-            $this->candys = $candidates;
-            $this->votees = array();
+        if ($candidates !== $this->options) {
+            $this->options = $candidates;
+            $this->votes = array();
         }
+    }
+
+    // remove a vote for a candidate
+    function deleteVote() {
+        foreach ($this->votes as $id => $vote)
+            if ($vote['user'] === $_SERVER['REMOTE_USER'])
+                unset ($this->vote[$id]);
     }
 }
