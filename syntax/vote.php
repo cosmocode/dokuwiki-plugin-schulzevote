@@ -202,6 +202,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         $max_vote = null;
         foreach($_POST['vote'] as $n => &$vote) {
             if ($vote !== '') {
+                $vote = explode(' ', $vote)[0];
                 if (!is_numeric($vote)) {
                     msg(sprintf($this->getLang('invalid_vote'), $data['candy'][$n]), -1);
                     $vote = '';
