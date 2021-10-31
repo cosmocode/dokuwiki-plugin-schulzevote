@@ -21,14 +21,14 @@ if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 
-class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function getType(){ return 'substition'; }
     function getPType(){ return 'block'; }
     function getSort(){ return 155; }
 
     function connectTo($mode) {
-         $this->Lexer->addSpecialPattern('<svote\b.*?>\n.*?\n</svote>',$mode,'plugin_myschulzevote_vote');
+         $this->Lexer->addSpecialPattern('<vote\b.*?>\n.*?\n</vote>',$mode,'plugin_schulzevote_vote');
     }
 
     function handle($match, $state, $pos, Doku_Handler $handler){
@@ -74,7 +74,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
         }
 
-        $hlp = plugin_load('helper', 'myschulzevote');
+        $hlp = plugin_load('helper', 'schulzevote');
         $hlp->createVote($candidates);
 
         return array('candy' => $candidates, 'opts' => $opts);
@@ -100,7 +100,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         // set alignment
         $align = $data['opts']['align'];
 
-        $hlp = plugin_load('helper', 'myschulzevote');
+        $hlp = plugin_load('helper', 'schulzevote');
 #        dbg($hlp);
 
         // check if the vote is over.
@@ -120,7 +120,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
                         $this->_winnerMsg($hlp, 'has_won');
         }
 
-        $form = new Doku_Form(array('id'=>'plugin__myschulzevote', 'class' => 'plugin_myschulzevote_'.$align));
+        $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
         $form->startFieldset($this->getLang('cast'));
         if ($open) {
             $form->addHidden('id', $ID);
@@ -225,7 +225,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
         }
 
-        $hlp = plugin_load('helper', 'myschulzevote');
+        $hlp = plugin_load('helper', 'schulzevote');
         if (!$hlp->vote(array_combine($data['candy'], $_POST['vote']))) {
             msg($this->getLang('invalidated_vote'), -1);
             return;
@@ -234,7 +234,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
     }
 
     function _handleunvote($data) {
-        $hlp = plugin_load('helper', 'myschulzevote');
+        $hlp = plugin_load('helper', 'schulzevote');
         $hlp->deleteVote();
         msg($this->getLang('unvoted'), 1);
     }

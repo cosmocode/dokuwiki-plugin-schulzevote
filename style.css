@@ -1,50 +1,49 @@
 
-#plugin__myschulzevote {
+#plugin__schulzevote {
     padding: 1em 1em 0 1em;
     margin: .5em;
 }
 
-.plugin_myschulzevote_center {
+.plugin_schulzevote_center {
     margin-left: auto;
     margin-right: auto;
 }
-.plugin_myschulzevote_left {
+.plugin_schulzevote_left {
     float:left;
 }
-.plugin_myschulzevote_right {
+.plugin_schulzevote_right {
     float:right;
 }
 
-#plugin__myschulzevote fieldset legend {
+#plugin__schulzevote fieldset legend {
     text-align: left;
 }
 
-#plugin__myschulzevote p {
+#plugin__schulzevote p {
     text-align:center;
 }
 
-#plugin__myschulzevote table {
+#plugin__schulzevote table {
     font-weight: bold;
     text-align:left;
     width: 100%;
     min-width: 600px;
 }
 
-#plugin__myschulzevote table td {
+#plugin__schulzevote table td {
     padding: 0 1.5em;
 }
 
-#plugin__myschulzevote .candy span {
+#plugin__schulzevote .candy span {
     display: none;
 }
 
-#plugin__myschulzevote label.block input {
+#plugin__schulzevote label.block input {
     float: left;
     width: 50px;
 }
 
-#plugin__myschulzevote .votebar {
+#plugin__schulzevote .votebar {
     display: block;
-    //background-color: __background_alt__;
-    background-color: #cc0000;
+    background-color: __background_alt__;
 }

@@ -4,11 +4,11 @@
 if (!defined('DOKU_INC')) die();
 require_once(DOKU_INC.'inc/pluginutils.php');
 
-class helper_plugin_myschulzevote extends DokuWiki_Plugin {
+class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     function __construct() {
         global $ID;
-        $data = p_get_metadata($ID, 'myschulzevote');
+        $data = p_get_metadata($ID, 'schulzevote');
         $this->options = $data['options'];
         $this->votes = $data['votes'];
 
@@ -47,7 +47,7 @@ class helper_plugin_myschulzevote extends DokuWiki_Plugin {
 
     function __destruct() {
         global $ID;
-        p_set_metadata($ID, array('myschulzevote' => array('options' => $this->options, 'votes' => $this->votes)));
+        p_set_metadata($ID, array('schulzevote' => array('options' => $this->options, 'votes' => $this->votes)));
     }
 
     // run a vote $data = array('a' => 1, 'b' => 2, 'c' => 2, 'd' => 3)
