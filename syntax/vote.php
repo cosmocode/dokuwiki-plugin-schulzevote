@@ -28,7 +28,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
     function getSort(){ return 155; }
 
     function connectTo($mode) {
-         $this->Lexer->addSpecialPattern('<svote[ ,=a-zA-Z0-9-]*?>\n.*?\n</svote>',$mode,'plugin_myschulzevote_vote');
+         $this->Lexer->addSpecialPattern('<svote\b.*?>\n.*?\n</svote>',$mode,'plugin_myschulzevote_vote');
     }
 
     function handle($match, $state, $pos, Doku_Handler $handler){
@@ -38,7 +38,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         // Determine date from syntax
         $opts['date'] = null;
 
-        if (preg_match('/\d{4}-\d{2}-\d{2}/', $lines[0], $opts['date'])) {
+        if (preg_match('/ \d{4}-\d{2}-\d{2}/', $lines[0], $opts['date'])) {
 
             $opts['date'] = strtotime($opts['date'][0]);
             if ($opts['date'] === false || $opts['date'] === -1) {
@@ -46,9 +46,14 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
         }
 
-        $opts['admins'] = array();
-        if (preg_match('/admins=([a-zA-Z0-9,]+)/', $lines[0], $admins)) {
-            $opts['admins'] = explode(',', $admins[1]);
+        $opts['admin_users'] = array();
+        if (preg_match('/ adminUsers=([a-zA-Z0-9,]+)/', $lines[0], $admins)) {
+            $opts['admin_users'] = explode(',', $admins[1]);
+        }
+
+        $opts['admin_groups'] = array();
+        if (preg_match('/ adminGroups=([a-zA-Z0-9,]+)/', $lines[0], $admins)) {
+            $opts['admin_groups'] = explode(',', $admins[1]);
         }
 
         // Determine align informations
@@ -236,7 +241,13 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _isInSuperUsers($data) {
         global $INFO;
-        foreach ($data['opts']['admins'] as $su_group)
+
+        if (!isset($data['opts']['admin_users']) || !isset($data['opts']['admin_groups']))
+            return false; // ensure backward-compatibility with former polls
+        foreach ($data['opts']['admin_users'] as $su_user)
+            if ($_SERVER['REMOTE_USER'] === $su_user)
+                return true;
+        foreach ($data['opts']['admin_groups'] as $su_group)
             foreach ($INFO['userinfo']['grps'] as $user_group)
                 if ($user_group === $su_group)
                     return true;
