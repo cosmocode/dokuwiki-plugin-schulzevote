@@ -14,3 +14,4 @@ $lang['invalidated_vote'] = 'Your vote is invalid. Please verify that<ol><li>you
 $lang['vote'] = 'Vote';
 $lang['voted'] = 'Your vote was successfully registered.';
 $lang['vote_cancel'] = 'Cancel your vote';
+$lang['unvoted'] = 'Your vote was successfully canceled';

@@ -74,7 +74,10 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
 
         if ($mode != 'xhtml') return false;
 
-        if ((isset($_POST['vote']) || isset($_POST['vote_cancel'])) && checkSecurityToken()) {
+        if (isset($_POST['already_voted']) && checkSecurityToken()) {
+            $this->_handleunvote($data);
+        }
+        if (isset($_POST['vote']) && checkSecurityToken()) {
             $this->_handlepost($data);
         }
         $this->_html($renderer, $data);
@@ -119,6 +122,9 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         if ($open) {
             $form->addHidden('id', $ID);
         }
+        else {
+            $form->addHidden('already_voted', true);
+        }
 
         $form->addElement('<table>');
         foreach ($data['candy'] as $n => $candy) {
@@ -149,7 +155,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             $form->addElement($this->_winnerMsg($hlp, 'leading'));
             $form->addElement('</p>');
         } else {
-            $form->addElement(form_makeButton('submit', 'vote_cancel', $this->getLang('vote_cancel')));
+            $form->addElement(form_makeButton('submit', '', $this->getLang('vote_cancel')));
             $form->addElement('<p>' . $closemsg . '</p>');
         }
 
@@ -194,6 +200,12 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             return;
         }
         msg($this->getLang('voted'), 1);
+    }
+
+    function _handleunvote($data) {
+        $hlp = plugin_load('helper', 'myschulzevote');
+        $hlp->deleteVote();
+        msg($this->getLang('unvoted'), 1);
     }
 
     function _render($str) {

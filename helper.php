@@ -191,7 +191,10 @@ class helper_plugin_myschulzevote extends DokuWiki_Plugin {
     // remove a vote for a candidate
     function deleteVote() {
         foreach ($this->votes as $id => $vote)
-            if ($vote['user'] === $_SERVER['REMOTE_USER'])
-                unset ($this->vote[$id]);
+            if ($vote['user'] === $_SERVER['REMOTE_USER']) {
+                unset ($this->votes[$id]);
+                return true;
+            }
+        return false;
     }
 }

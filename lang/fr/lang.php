@@ -15,3 +15,4 @@ $lang['invalidated_vote'] = 'Votre vote n\'est pas valide. Veuillez vérifier qu
 $lang['vote'] = 'Voter';
 $lang['voted'] = 'Votre vote a bien été enregistré.';
 $lang['vote_cancel'] = 'Annuler votre vote';
+$lang['unvoted'] = 'Votre vote a bien été annulé.';
