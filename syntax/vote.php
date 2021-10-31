@@ -28,7 +28,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
     function getSort(){ return 155; }
 
     function connectTo($mode) {
-         $this->Lexer->addSpecialPattern('<svote[ a-z0-9-]*?>\n.*?\n</svote>',$mode,'plugin_myschulzevote_vote');
+         $this->Lexer->addSpecialPattern('<svote[ ,=a-zA-Z0-9-]*?>\n.*?\n</svote>',$mode,'plugin_myschulzevote_vote');
     }
 
     function handle($match, $state, $pos, Doku_Handler $handler){
@@ -44,6 +44,11 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             if ($opts['date'] === false || $opts['date'] === -1) {
                 $opts['date'] = null;
             }
+        }
+
+        $opts['admins'] = array();
+        if (preg_match('/admins=([a-zA-Z0-9,]+)/', $lines[0], $admins)) {
+            $opts['admins'] = explode(',', $admins[1]);
         }
 
         // Determine align informations
@@ -110,13 +115,6 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
                         $this->_winnerMsg($hlp, 'has_won');
         }
 
-        $ranks = array();
-        foreach($hlp->getRanking() as $rank => $items) {
-            foreach($items as $item) {
-                $ranks[$item] = '<span class="votebar" style="width: ' . (80 / ($rank + 1)) . 'px">&nbsp;</span>';
-            }
-        }
-
         $form = new Doku_Form(array('id'=>'plugin__myschulzevote', 'class' => 'plugin_myschulzevote_'.$align));
         $form->startFieldset($this->getLang('cast'));
         if ($open) {
@@ -143,9 +141,6 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
                                   $class='block candy'));
                 $form->addElement('</td>');
             }
-            $form->addElement('<td>');
-            $form->addElement($ranks[$candy]);
-            $form->addElement('</td>');
             $form->addElement('</tr>');
         }
         $form->addElement('</table>');
@@ -161,6 +156,32 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         }
 
         $form->endFieldset();
+
+        // if admin
+        if ($this->_isInSuperUsers($data)) {
+            $ranks = array();
+            foreach($hlp->getRanking() as $rank => $items) {
+                foreach($items as $item) {
+                    $ranks[$item] = '<span class="votebar" style="width: ' . (80 / ($rank + 1)) . 'px">&nbsp;</span>';
+                }
+            }
+
+            $form->startFieldset('');
+            $form->addElement('<table>');
+            foreach ($data['candy'] as $n => $candy) {
+                $form->addElement('<tr>');
+                $form->addElement('<td>');
+                $form->addElement($this->_render($candy));
+                $form->addElement('</td>');
+                $form->addElement('<td>');
+                $form->addElement($ranks[$candy]);
+                $form->addElement('</td>');
+                $form->addElement('</tr>');
+            }
+            $form->addElement('</table>');
+            $form->endFieldset();
+        }
+
         $renderer->doc .=  $form->getForm();
 
         return true;
@@ -211,6 +232,15 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _render($str) {
         return p_render('xhtml', array_slice(p_get_instructions($str), 2, -2), $notused);
+    }
+
+    function _isInSuperUsers($data) {
+        global $INFO;
+        foreach ($data['opts']['admins'] as $su_group)
+            foreach ($INFO['userinfo']['grps'] as $user_group)
+                if ($user_group === $su_group)
+                    return true;
+        return false;
     }
 
     function _buildProposals($data) {
