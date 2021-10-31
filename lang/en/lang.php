@@ -9,6 +9,7 @@ $lang['howto']          = 'Please enter numbers to indicate which option you pre
 $lang['leading'] = '%s is currently leading.';
 $lang['has_won'] = '%s has won.';
 
+$lang['error_found'] = 'One or several errors were found:<br /><br /><ul>%s</ul>';
 $lang['invalid_vote'] = 'Your vote for %s is not numeric.';
 $lang['invalidated_vote'] = 'Your vote is invalid. Please verify that<ol><li>you have not yet voted</li><li>all the scores are different, and</li><li>you did not forget a \'0\'.</li></ol>';
 $lang['vote'] = 'Vote';

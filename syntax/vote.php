@@ -199,12 +199,13 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _handlepost($data) {
         $err = false;
+        $err_str = "";
         $max_vote = null;
         foreach($_POST['vote'] as $n => &$vote) {
             if ($vote !== '') {
                 $vote = explode(' ', $vote)[0];
                 if (!is_numeric($vote)) {
-                    msg(sprintf($this->getLang('invalid_vote'), $data['candy'][$n]), -1);
+                    $err_str .= "<li>" . $this->render_text(sprintf($this->getLang('invalid_vote'), $data['candy'][$n]), 'xhtml') . "</li>";
                     $vote = '';
                     $err = true;
                 } else {
@@ -214,6 +215,8 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
         }
         unset($vote);
+        if ($err_str != "")
+            msg(sprintf($this->getLang('error_found'), $err_str), -1);
         if ($err || count(array_filter($_POST['vote'])) === 0) return;
 
         foreach($_POST['vote'] as &$vote) {

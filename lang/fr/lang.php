@@ -10,7 +10,8 @@ $lang['leading'] = '';
 //$lang['leading'] = '"%s" mène actuellement le vote.';
 $lang['has_won'] = '"%s" remporte le vote.';
 
-$lang['invalid_vote'] = 'Votre vote pour "%s" n\'est pas un nombre.';
+$lang['error_found'] = 'Une ou plusieurs erreurs ont été trouvées :<br /><br /><ul>%s</ul>';
+$lang['invalid_vote'] = 'Votre vote pour "%s" n\'est pas un nombre valide.';
 $lang['invalidated_vote'] = 'Votre vote n\'est pas valide. Veuillez vérifier que<ol><li>vous n\'avez pas déjà voté,</li><li>tous les scores sont différents, et</li><li>vous n\'avez pas omis un \'0\'.</li></ol>';
 $lang['vote'] = 'Voter';
 $lang['voted'] = 'Votre vote a bien été enregistré.';
