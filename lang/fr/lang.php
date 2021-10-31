@@ -16,3 +16,5 @@ $lang['vote'] = 'Voter';
 $lang['voted'] = 'Votre vote a bien été enregistré.';
 $lang['vote_cancel'] = 'Annuler votre vote';
 $lang['unvoted'] = 'Votre vote a bien été annulé.';
+$lang['first_choice'] = '%d (choix préféré)';
+$lang['last_choice'] = '%d (dernier choix)';

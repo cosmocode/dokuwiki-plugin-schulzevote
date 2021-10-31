@@ -127,6 +127,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
         }
 
         $form->addElement('<table>');
+        $proposals = $this->_buildProposals($data);
         foreach ($data['candy'] as $n => $candy) {
             $form->addElement('<tr>');
             $form->addElement('<td>');
@@ -135,7 +136,7 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
             if ($open) {
                 $form->addElement('<td>');
                 $form->addElement(form_makeListboxField('vote[' . $n . ']',
-                                  range(0, sizeof($data['candy'])),
+                                  $proposals,
                                   isset($_POST['vote']) ? $_POST['vote'][$n] : '',
                                   $this->_render($candy),
                                   $n,
@@ -210,6 +211,17 @@ class syntax_plugin_myschulzevote_vote extends DokuWiki_Syntax_Plugin {
 
     function _render($str) {
         return p_render('xhtml', array_slice(p_get_instructions($str), 2, -2), $notused);
+    }
+
+    function _buildProposals($data) {
+        $candy = $data['candy'];
+        $proposals = range(0, sizeof($candy));
+        $proposals[0] = '-';
+        if (sizeof($candy) > 0) {
+            $proposals[1] = sprintf($this->getLang('first_choice'), $proposals[1]);
+            $proposals[sizeof($candy)] = sprintf($this->getLang('last_choice'), $proposals[sizeof($candy)]);
+        }
+        return $proposals;
     }
 }
 

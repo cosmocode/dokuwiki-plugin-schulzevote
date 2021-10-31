@@ -15,3 +15,5 @@ $lang['vote'] = 'Vote';
 $lang['voted'] = 'Your vote was successfully registered.';
 $lang['vote_cancel'] = 'Cancel your vote';
 $lang['unvoted'] = 'Your vote was successfully canceled';
+$lang['first_choice'] = '%d (first choice)';
+$lang['last_choice'] = '%d (last choice)';
