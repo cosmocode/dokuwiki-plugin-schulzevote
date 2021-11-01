@@ -35,6 +35,11 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         $lines = explode("\n", $match);
 
         $opts = array();
+        $opts['hide_results'] = false;
+        if (preg_match('/ hideResults/', $lines[0], $hide_results)) {
+            $opts['hide_results'] = true;
+        }
+
         // Determine date from syntax
         $opts['date'] = null;
 
@@ -114,56 +119,45 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 $open = false;
                 $closemsg = $this->getLang('already_voted');
             }
-            $closemsg .= '<br />'.$this->_winnerMsg($hlp, 'leading');
         } else {
             $closemsg = $this->getLang('vote_over').'<br />'.
                         $this->_winnerMsg($hlp, 'has_won');
         }
 
-        $form = new Doku_Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
-        $form->startFieldset($this->getLang('cast'));
+        $form = new dokuwiki\Form\Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
+        $form->addFieldsetOpen($this->getLang('cast'));
         if ($open) {
-            $form->addHidden('id', $ID);
-        }
-        else {
-            $form->addHidden('already_voted', true);
+            $form->setHiddenField('id', $ID);
         }
 
-        $form->addElement('<table>');
+        $form->addTagOpen('table');
         $proposals = $this->_buildProposals($data);
         foreach ($data['candy'] as $n => $candy) {
-            $form->addElement('<tr>');
-            $form->addElement('<td>');
-            $form->addElement($this->_render($candy));
-            $form->addElement('</td>');
+            $form->addTagOpen('tr');
+            $form->addTagOpen('td');
+            $form->addLabel($this->_render($candy));
+            $form->addTagClose('td');
             if ($open) {
-                $form->addElement('<td>');
-                $form->addElement(form_makeListboxField('vote[' . $n . ']',
-                                  $proposals,
-                                  isset($_POST['vote']) ? $_POST['vote'][$n] : '',
-                                  $this->_render($candy),
-                                  $n,
-                                  $class='block candy'));
-                $form->addElement('</td>');
+                $form->addTagOpen('td');
+                $dd = $form->addDropdown('vote[' . $n . ']', $proposals);
+                $form->addTagClose('td');
             }
-            $form->addElement('</tr>');
+            $form->addTagClose('tr');
         }
-        $form->addElement('</table>');
+        $form->addTagClose('table');
 
         if ($open) {
-            $form->addElement('<p>'.$this->getLang('howto').'</p>');
-            $form->addElement(form_makeButton('submit','', $this->getLang('vote')));
-            $form->addElement($this->_winnerMsg($hlp, 'leading'));
-            $form->addElement('</p>');
+            $form->addHTML('<p>'.$this->getLang('howto').'</p>');
+            $form->addButton('submit', $this->getLang('vote'));
         } else {
-            $form->addElement(form_makeButton('submit', '', $this->getLang('vote_cancel')));
-            $form->addElement('<p>' . $closemsg . '</p>');
+            $form->addButton('vote_cancel', $this->getLang('vote_cancel'));
+            $form->addHTML('<p>' . $closemsg . '</p>');
         }
 
-        $form->endFieldset();
+        $form->addFieldsetClose();
 
-        // if admin
-        if ($this->_isInSuperUsers($data)) {
+        // if admin or results not hidden
+        if (!$data['opts']['hide_results'] || $this->_isInSuperUsers($data)) {
             $ranks = array();
             foreach($hlp->getRanking() as $rank => $items) {
                 foreach($items as $item) {
@@ -171,24 +165,24 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 }
             }
 
-            $form->startFieldset('');
-            $form->addElement('<p>' . $this->_winnerMsg($hlp, 'leading') . '</p>');
-            $form->addElement('<table>');
+            $form->addFieldsetOpen($this->getLang('intermediate_results'));
+            $form->addHTML('<p>' . $this->_winnerMsg($hlp, 'leading') . '</p>');
+            $form->addTagOpen('table');
             foreach ($data['candy'] as $n => $candy) {
-                $form->addElement('<tr>');
-                $form->addElement('<td>');
-                $form->addElement($this->_render($candy));
-                $form->addElement('</td>');
-                $form->addElement('<td>');
-                $form->addElement($ranks[$candy]);
-                $form->addElement('</td>');
-                $form->addElement('</tr>');
+                $form->addTagOpen('tr');
+                $form->addTagOpen('td');
+                $form->addLabel($this->_render($candy));
+                $form->addTagClose('td');
+                $form->addTagOpen('td');
+                $form->addHTML($ranks[$candy]);
+                $form->addTagClose('td');
+                $form->addTagClose('tr');
             }
-            $form->addElement('</table>');
-            $form->endFieldset();
+            $form->addTagClose('table');
+            $form->addFieldsetClose();
         }
 
-        $renderer->doc .=  $form->getForm();
+        $renderer->doc .=  $form->toHTML();
 
         return true;
     }

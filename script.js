@@ -4,7 +4,7 @@
 
 jQuery('select[name*="vote"').change(function(){
     // start by setting everything to enabled
-    jQuery('select[name*="vote"] option').attr('disabled',false);
+    jQuery('select[name*="vote"] option').attr('disabled', false);
     // loop each select and set the selected value to disabled in all other selects
     jQuery('select[name*="vote"]').each(function(){
         var $this = jQuery(this);
