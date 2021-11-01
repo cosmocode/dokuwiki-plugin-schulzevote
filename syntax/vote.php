@@ -172,6 +172,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
 
             $form->startFieldset('');
+            $form->addElement('<p>' . $this->_winnerMsg($hlp, 'leading') . '</p>');
             $form->addElement('<table>');
             foreach ($data['candy'] as $n => $candy) {
                 $form->addElement('<tr>');

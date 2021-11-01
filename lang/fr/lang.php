@@ -6,8 +6,7 @@ $lang['vote_over']      = 'Ce vote est terminé.';
 $lang['cast']           = 'Voter';
 $lang['howto']          = 'Veuillez indiquer votre préférence par un nombre, le plus petit nombre représentant votre choix préféré.<br /><b>Attention</b> : vous ne pouvez voter qu\'une seule fois !';
 
-$lang['leading'] = '';
-//$lang['leading'] = '"%s" mène actuellement le vote.';
+$lang['leading'] = '"%s" mène actuellement le vote.';
 $lang['has_won'] = '"%s" remporte le vote.';
 
 $lang['error_found'] = 'Une ou plusieurs erreurs ont été trouvées :<br /><br /><ul>%s</ul>';
