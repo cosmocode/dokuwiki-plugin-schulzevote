@@ -88,7 +88,9 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
         if ($mode != 'xhtml') return false;
 
-        if (isset($_POST['already_voted']) && checkSecurityToken()) {
+        global $INPUT;
+
+        if ($INPUT->post->int('vote_cancel') && checkSecurityToken()) {
             $this->_handleunvote($data);
         }
         if (isset($_POST['vote']) && checkSecurityToken()) {
