@@ -140,7 +140,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             $form->addTagClose('td');
             if ($open) {
                 $form->addTagOpen('td');
-                $dd = $form->addDropdown('vote[' . $n . ']', $proposals);
+                $form->addDropdown('vote[' . $n . ']', $proposals)->addClass('plugin__schulzevote__vote_selector');
                 $form->addTagClose('td');
             }
             $form->addTagClose('tr');
