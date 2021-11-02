@@ -167,6 +167,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
         // if admin or results not hidden
         if (!$data['opts']['hide_results'] || $this->_isInSuperUsers($data)) {
             $form = new dokuwiki\Form\Form(array('class' => 'plugin_schulzevote_'.$align));
+            $form->addTagOpen('div')->attr('id', 'plugin__schulzevote');
             $ranks = array();
             foreach($hlp->getRanking() as $rank => $items) {
                 foreach($items as $item) {
@@ -189,6 +190,7 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
             $form->addTagClose('table');
             $form->addFieldsetClose();
+            $form->addTagClose('div');
             $renderer->doc .=  $form->toHTML();
         }
 
