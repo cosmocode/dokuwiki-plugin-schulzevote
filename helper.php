@@ -12,22 +12,9 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         $this->votes = array();
         $this->outdated = false;
         if (!isset($data['votes'])) {
-            // did not find any votes list
+            // did not find any votes list ; must be an old vote
             if (isset($data['prefer']) && isset($data['votees'])) {
-                // dealing with older data
-                $vote = array('user' => 'unknown', 'data' => array());
-                $vote_this = array('user' => $_SERVER['REMOTE_USER'], 'data' => array());
-                foreach ($this->candys as $cand) {
-                    $vote['data'][$cand] = 1;
-                    $vote_this['data'][$cand] = 0;
-                }
-                foreach ($data['prefer'] as $cand => $pref) {
-                    foreach ($pref as $cand2 => $score) {
-                        $vote['data'][$cand2] += $score;
-                    }
-                }
-                array_push($this->votes, $vote, $vote_this);
-                $this->outdated = true;
+                $this->updatePoll();
             }
         }
         else {
@@ -222,5 +209,22 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
                 return true;
             }
         return false;
+    }
+
+    // dealing with older data
+    function updatePoll($data) {
+        $vote = array('user' => 'unknown', 'data' => array());
+        $vote_this = array('user' => $_SERVER['REMOTE_USER'], 'data' => array());
+        foreach ($this->candys as $cand) {
+            $vote['data'][$cand] = 1;
+            $vote_this['data'][$cand] = 0;
+        }
+        foreach ($data['prefer'] as $cand => $pref) {
+            foreach ($pref as $cand2 => $score) {
+                $vote['data'][$cand2] += $score;
+            }
+        }
+        array_push($this->votes, $vote, $vote_this);
+        $this->outdated = true;
     }
 }
