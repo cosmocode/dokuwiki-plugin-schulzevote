@@ -11,10 +11,13 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         $this->candys = $data['candys'];
         $this->votes = array();
         $this->outdated = false;
+        if (isset($data['outdated'])) {
+            $this->outdated = $data['outdated'];
+        }
         if (!isset($data['votes'])) {
             // did not find any votes list ; must be an old vote
             if (isset($data['prefer']) && isset($data['votees'])) {
-                $this->updatePoll();
+                $this->updatePoll($data);
             }
         }
         else {
@@ -60,7 +63,8 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         global $ID;
         p_set_metadata($ID, array('schulzevote' => array(
             'candys' => $this->candys,
-            'votes' => $this->votes)));
+            'votes' => $this->votes,
+            'outdated' => $this->outdated)));
     }
 
     // run a vote $data = array('a' => 1, 'b' => 2, 'c' => 2, 'd' => 3)
