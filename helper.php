@@ -215,6 +215,16 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         return false;
     }
 
+    // get user's vote
+    function getVote() {
+        foreach ($this->votes as $id => $vote) {
+            if ($vote['user'] === $_SERVER['REMOTE_USER']) {
+                return $vote['data'];
+            }
+        }
+        return array();
+    }
+
     // dealing with older data
     function updatePoll($data) {
         $vote = array('user' => 'unknown', 'data' => array());
