@@ -108,12 +108,13 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
         $hlp = plugin_load('helper', 'schulzevote');
 #        dbg($hlp);
+
+        // check if the vote is over or outdated.
+        $open = ($data['opts']['date'] !== null) && ($data['opts']['date'] > time());
         if ($hlp->outdated) {
+            $open = false;
             msg($this->getLang('outdated_poll'), 0);
         }
-
-        // check if the vote is over.
-        $open = ($data['opts']['date'] !== null) && ($data['opts']['date'] > time());
         if ($open) {
             $renderer->info['cache'] = false;
             if (!isset($_SERVER['REMOTE_USER'])) {
@@ -128,40 +129,41 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                         $this->_winnerMsg($hlp, 'has_won');
         }
 
-        $form = new dokuwiki\Form\Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
-        $form->addFieldsetOpen($this->getLang('cast'));
         if ($open) {
+            $form = new dokuwiki\Form\Form(array('id'=>'plugin__schulzevote', 'class' => 'plugin_schulzevote_'.$align));
+            $form->addFieldsetOpen($this->getLang('cast'));
             $form->setHiddenField('id', $ID);
-        }
-
-        $form->addTagOpen('table');
-        $proposals = $this->_buildProposals($data);
-        foreach ($data['candy'] as $n => $candy) {
-            $form->addTagOpen('tr');
-            $form->addTagOpen('td');
-            $form->addLabel($this->_render($candy));
-            $form->addTagClose('td');
-            if ($open) {
+            $form->addTagOpen('table');
+            $proposals = $this->_buildProposals($data);
+            foreach ($data['candy'] as $n => $candy) {
+                $form->addTagOpen('tr');
                 $form->addTagOpen('td');
-                $form->addDropdown('vote[' . $n . ']', $proposals)->addClass('plugin__schulzevote__vote_selector');
+                $form->addLabel($this->_render($candy));
                 $form->addTagClose('td');
+                if ($open) {
+                    $form->addTagOpen('td');
+                    $form->addDropdown('vote[' . $n . ']', $proposals)->addClass('plugin__schulzevote__vote_selector');
+                    $form->addTagClose('td');
+                }
+                $form->addTagClose('tr');
             }
-            $form->addTagClose('tr');
-        }
-        $form->addTagClose('table');
+            $form->addTagClose('table');
 
-        if ($open) {
-            $form->addHTML('<p>'.$this->getLang('howto').'</p>');
-            $form->addButton('submit', $this->getLang('vote'));
-        } else {
-            $form->addButton('vote_cancel', $this->getLang('vote_cancel'));
-            $form->addHTML('<p>' . $closemsg . '</p>');
-        }
+            if (!$hlp->hasVoted()) {
+                $form->addHTML('<p>'.$this->getLang('howto').'</p>');
+                $form->addButton('submit', $this->getLang('vote'));
+            } else {
+                $form->addButton('vote_cancel', $this->getLang('vote_cancel'));
+                $form->addHTML('<p>' . $closemsg . '</p>');
+            }
 
-        $form->addFieldsetClose();
+            $form->addFieldsetClose();
+            $renderer->doc .=  $form->toHTML();
+        }
 
         // if admin or results not hidden
         if (!$data['opts']['hide_results'] || $this->_isInSuperUsers($data)) {
+            $form = new dokuwiki\Form\Form(array('class' => 'plugin_schulzevote_'.$align));
             $ranks = array();
             foreach($hlp->getRanking() as $rank => $items) {
                 foreach($items as $item) {
@@ -184,9 +186,8 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
             }
             $form->addTagClose('table');
             $form->addFieldsetClose();
+            $renderer->doc .=  $form->toHTML();
         }
-
-        $renderer->doc .=  $form->toHTML();
 
         return true;
     }
