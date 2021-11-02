@@ -108,6 +108,9 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
 
         $hlp = plugin_load('helper', 'schulzevote');
 #        dbg($hlp);
+        if ($hlp->outdated) {
+            msg($this->getLang('outdated_poll'), 0);
+        }
 
         // check if the vote is over.
         $open = ($data['opts']['date'] !== null) && ($data['opts']['date'] > time());

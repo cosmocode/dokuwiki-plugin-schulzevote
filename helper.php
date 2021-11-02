@@ -8,8 +8,19 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     function __construct() {
         global $ID;
         $data = p_get_metadata($ID, 'schulzevote');
-        $this->options = $data['options'];
-        $this->votes = $data['votes'];
+        $this->candys = $data['candys'];
+        $this->outdated = false;
+        if (!isset($data['votes'])) { // did not find any votes list
+            $this->votes = array();
+            if (isset($data['prefer']) && isset($data['votees'])) {
+                // dealing with older data
+                //FIXME need to introduce converter
+                $this->outdated = true;
+            }
+        }
+        else {
+            $this->votes = $data['votes'];
+        }
 
 /* Ambiguous, but B > C and D > A
         $prefer = array(
@@ -18,7 +29,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 'C' => array('A' => 4, 'B' => 2, 'C' => 0, 'D' => 5),
 'D' => array('A' => 6, 'B' => 4, 'C' => 4, 'D' => 0),
 );
-        $this->options = array(
+        $this->candys = array(
 'A' => 'A',
 'B' => 'B',
 'C' => 'C',
@@ -34,7 +45,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 'D' => array('A' => 15, 'B' => 12, 'C' => 28, 'D' => 0, 'E' => 14),
 'E' => array('A' => 23, 'B' => 27, 'C' => 21, 'D' => 31, 'E' => 0),
 );
-        $this->options = array(
+        $this->candys = array(
 'A' => 'A',
 'B' => 'B',
 'C' => 'C',
@@ -44,9 +55,11 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 */
     }
 
+    public $outdated;
+
     function __destruct() {
         global $ID;
-        p_set_metadata($ID, array('schulzevote' => array('options' => $this->options, 'votes' => $this->votes)));
+        p_set_metadata($ID, array('schulzevote' => array('candys' => $this->candys, 'votes' => $this->votes)));
     }
 
     // run a vote $data = array('a' => 1, 'b' => 2, 'c' => 2, 'd' => 3)
@@ -96,8 +109,8 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
         $in = $this->getPreferences();
         $out = array();
-        foreach ($this->options as $i) {
-            foreach ($this->options as $j) {
+        foreach ($this->candys as $i) {
+            foreach ($this->candys as $j) {
                 if ($i != $j && $in[$i][$j] > $in[$j][$i]) {
                     $out[$i][$j] = $in[$i][$j];
                 } else {
@@ -106,10 +119,10 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
             }
         }
 
-        foreach ($this->options as $i) {
-            foreach ($this->options as $j) {
+        foreach ($this->candys as $i) {
+            foreach ($this->candys as $j) {
                 if ($i!=$j) {
-                    foreach ($this->options as $k) {
+                    foreach ($this->candys as $k) {
                         if ($i!=$k) {
                             if ($j!=$k) {
                                 $out[$j][$k] = max($out[$j][$k], min($out[$j][$i], $out[$i][$k]));
@@ -148,7 +161,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         $get = $this->get();
 #dbg($get);
 
-        foreach ($this->options as $test) {
+        foreach ($this->candys as $test) {
 #            echo "test $test...";
             if ($this->isWinner($test, $get)) {
 #                echo "winner!";
@@ -160,7 +173,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     }
 
     function isWinnerCandidate($candy, $get) {
-        foreach ($this->options as $other) {
+        foreach ($this->candys as $other) {
             if ($candy == $other) continue;
             if ($get[$candy][$other] < $get[$other][$candy]) {
                 return false;
@@ -170,7 +183,7 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
     }
 
     function isWinner($candy, $get) {
-        foreach ($this->options as $other) {
+        foreach ($this->candys as $other) {
             if ($candy == $other) continue;
             if ($get[$candy][$other] <= $get[$other][$candy]) {
                 return false;
@@ -181,8 +194,8 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     // create a new vote to a candidate array
     function createVote($candidates) {
-        if ($candidates !== $this->options) {
-            $this->options = $candidates;
+        if ($candidates !== $this->candys) {
+            $this->candys = $candidates;
             $this->votes = array();
         }
     }

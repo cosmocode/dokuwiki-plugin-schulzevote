@@ -1,4 +1,5 @@
 <?php
+$lang['outdated_poll'] = 'Ce sondage est obsolète. Vous pouvez demander à l\'administrateur de le mettre à jour.';
 $lang['intermediate_results'] = 'Résultats intermédiaires';
 $lang['no_remote_user'] = 'Veuillez vous connecter pour voter.';
 $lang['already_voted']  = 'Vous avez déjà voté.';

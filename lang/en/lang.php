@@ -1,4 +1,5 @@
 <?php
+$lang['outdated_poll'] = 'This poll is outdated. You may ask the administrator to updated it.';
 $lang['intermediate_results'] = 'Intermediate results';
 $lang['no_remote_user'] = 'Please login to vote.';
 $lang['already_voted']  = 'You’ve already voted.';
