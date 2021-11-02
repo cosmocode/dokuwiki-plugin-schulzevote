@@ -121,7 +121,6 @@ class syntax_plugin_schulzevote_vote extends DokuWiki_Syntax_Plugin {
                 $open = false;
                 $closemsg = $this->getLang('no_remote_user');
             } elseif ($hlp->hasVoted()) {
-                $open = false;
                 $closemsg = $this->getLang('already_voted');
             }
         } else {
