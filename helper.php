@@ -9,12 +9,24 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
         global $ID;
         $data = p_get_metadata($ID, 'schulzevote');
         $this->candys = $data['candys'];
+        $this->votes = array();
         $this->outdated = false;
-        if (!isset($data['votes'])) { // did not find any votes list
-            $this->votes = array();
+        if (!isset($data['votes'])) {
+            // did not find any votes list
             if (isset($data['prefer']) && isset($data['votees'])) {
                 // dealing with older data
-                //FIXME need to introduce converter
+                $vote = array('user' => 'unknown', 'data' => array());
+                $vote_this = array('user' => $_SERVER['REMOTE_USER'], 'data' => array());
+                foreach ($this->candys as $cand) {
+                    $vote['data'][$cand] = 1;
+                    $vote_this['data'][$cand] = 0;
+                }
+                foreach ($data['prefer'] as $cand => $pref) {
+                    foreach ($pref as $cand2 => $score) {
+                        $vote['data'][$cand2] += $score;
+                    }
+                }
+                array_push($this->votes, $vote, $vote_this);
                 $this->outdated = true;
             }
         }
@@ -59,7 +71,9 @@ class helper_plugin_schulzevote extends DokuWiki_Plugin {
 
     function __destruct() {
         global $ID;
-        p_set_metadata($ID, array('schulzevote' => array('candys' => $this->candys, 'votes' => $this->votes)));
+        p_set_metadata($ID, array('schulzevote' => array(
+            'candys' => $this->candys,
+            'votes' => $this->votes)));
     }
 
     // run a vote $data = array('a' => 1, 'b' => 2, 'c' => 2, 'd' => 3)
